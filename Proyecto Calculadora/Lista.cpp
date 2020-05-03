@@ -71,7 +71,7 @@ Nodo* Lista::insertarNodoFinalLista(char simbolo, Nodo* lista)
 Nodo* Lista::pop(char* valor, Nodo* pila)
 {
 	Nodo* auxNodo = NULL;
-	char auxCaracter;
+	char auxCaracter=' ';
 	// Verificamos si la pila esta vacio o no tiene valores 
 	if (pila == NULL) {
 		printf("Pila es vacia!");
@@ -88,11 +88,9 @@ Nodo* Lista::pop(char* valor, Nodo* pila)
 		*valor = auxCaracter;
 
 		free(auxNodo);
-
-
 	}
 
-
+	return pila;
 }
 
 // Metodo para mostrar los elementos de la lista 
@@ -117,7 +115,7 @@ bool Lista::verificarParentesisBalanceados(char expresion[])
 {
 	Nodo* auxNodo = NULL;
 	int longitudExpresion,i;
-	char valorDato;
+	char valorDato=' ';
 
 	auxNodo=(Nodo*)malloc(sizeof(Nodo)); // Creamos y definimos el nuevo nodo auxiliar
 	// obtenemos el tamaño de la expresion pasada
@@ -125,24 +123,32 @@ bool Lista::verificarParentesisBalanceados(char expresion[])
 
 	for (i = 0; i < longitudExpresion; i++) {
 		// Verificamos si el caracter es igual a un parentesis de apertura
-		if (expresion[i] == '(')
+		if (expresion[i] == '(') {
+			printf("\n ( \n ");
 			// Gaurdamos el valor en el nodo auxiliar
 			auxNodo = push(expresion[i], auxNodo);
+		}
 		// Verificamos si el caracter es igual a un parentesis de cerrar
-		if (expresion[i] == ')')
+		if (expresion[i] == ')') {
+			printf("\n ) \n ");
 			// Eliminamos el valor que habiamos ingresado
 			auxNodo = pop(&valorDato, auxNodo);
+		}
 	}
 
 	// Verificamos el resultado de la pila si se encuntra vacia es que los 
 	// parentessi encontrados en la expresion eran correctos y la expresion
 	// estaba balanceada correctamente, se retorna respuesta verdadera
-	if (auxNodo == NULL)
+	if (auxNodo == NULL) {
+		printf("HOLA BEBE :3!");
 		return true;
-
+	}
+	std::cout<<"\n%%%%%%%"<<auxNodo->simbolo;
 	// Si pila auxiliar no es vacia se retrona false
 	return false;
 }
+
+// (6+4)*2/8^(7-4)
 
 
 // Funcion que verifica si el caracter sea un operador (+ , -, *, ^) 
@@ -150,16 +156,16 @@ bool Lista::verificarParentesisBalanceados(char expresion[])
 bool Lista::verificaElementoOperador(char simbolo)
 {
 	// Se verifica si el simbolo pasado es un operador y se devuelve un respuesta verdadera
-	switch (simbolo)
-	{
-	case '-': return true; break;
-	case '+': return true; break;
-	case '/': return true; break;
-	case '*': return true; break;
-	case '^': return true; break;
+switch (simbolo)
+{
+case '-': return true; break;
+case '+': return true; break;
+case '/': return true; break;
+case '*': return true; break;
+case '^': return true; break;
 	// Se lo contrario la respuesta sera falsa
-	default: return false; break;
-	}
+default: return false; break;
+}
 }
 
 // Metodo que retorna la prioridad de un elemento seleccionado
@@ -182,6 +188,7 @@ int Lista::obtenerPrioridadElementos(char simbolo)
 	else if (simbolo == '(')
 		return 0;
 
+return 0;
 }
 
 
@@ -193,10 +200,11 @@ Nodo* Lista::evaluaExpresionIngresada(char expresion[])
 	char valorDato;
 	int i, longitudExpresion;
 	// Creamos y definimos el nuevo nodo auxiliar
-	auxNodo = (Nodo*)malloc(sizeof(Nodo)); 
+	auxNodo = (Nodo*)malloc(sizeof(Nodo));
 	// Creamos y definimos el nuevo nodo de expresion postFija
-	expresionPostFija = (Nodo*)malloc(sizeof(Nodo)); 
+	expresionPostFija = (Nodo*)malloc(sizeof(Nodo));
 
+	longitudExpresion=strlen(expresion);
 	// Recorremos en un ciclo for el tamaño de la expresion para 
 	// evaluar los valores que esta contiene
 	for (i = 0; i < longitudExpresion; i++) {
@@ -226,14 +234,50 @@ Nodo* Lista::evaluaExpresionIngresada(char expresion[])
 					// Se recorre el nodo auxiliar para verificar que los elementos sean menores
 					// en prioridad
 					while (auxNodo != NULL) {
-						if ()
+
+						// Veirficamos que la prioridad de elementos guardados en el nodo auxiliar
+						// sea mayor que la expresion del dato evaluado
+						if (obtenerPrioridadElementos(auxNodo->simbolo) >=
+							obtenerPrioridadElementos(expresion[i])) {
+							// Si es asi entonces se saca le valor que este en el tope
+							// del nodo auxiliar y lo insertamos en la expresion post fija
+							auxNodo = pop(&valorDato, auxNodo);
+							expresionPostFija = push(valorDato, expresionPostFija);
+						}
+						// Falso sale del ciclo
+						else break;
 					}
+					// Se le pasa el valor que se evaluando al nodo auxliar
+					auxNodo = push(expresion[i], auxNodo);
 				}
+
 			}
 		}
 	}
-	
+	// Verificamos que si caracter a evaluar es un parentesis de cerrar expresion
+	// entonces debemos verificar acomodar y sacar todos los elementos del nodo auxliar
+	// y agregarlos a la lista del nodo de la expresion post fija
+	if (expresion[i] == ')') {
 
+		// Se recorre y se retira los operadores de  nodo auxliar minetras esta sean
+		// difentes al parentesis de apertura o esta no sea vacia - nula
+		while (auxNodo->simbolo !='(' && auxNodo != NULL){
+			// se retira el valor del nodo auxiliar 
+			auxNodo = pop(&valorDato, auxNodo);
+			// Se agrega el valor y se inserta al final del la expresion postfija
+			expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+		}
+		// Sacamos el caracter de parentesis de apertura
+			auxNodo = pop(&valorDato, auxNodo);
+	}
+
+	// Verificamos que no haya quedado un valor en nodo auxiliar y de ser asi 
+	// es sacado del nodo axuliar y agregado a la expresion postfija
+	while (auxNodo != NULL) {
+		auxNodo = pop(&valorDato, auxNodo);
+		expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+	}
+	return expresionPostFija;
 }
 
 
@@ -275,7 +319,7 @@ int Lista::insertarValor(int valorAgregar)
 		aux->sig = nuevo;   // El último nodo lo ponermos a apuntar al nuevo nodo.
 		nuevo->ant = aux;
 	}
-
+	return 0;
 }
 
 
@@ -353,7 +397,7 @@ NodoFloat* Lista::popFloat(float* valor, NodoFloat* pila)
 
 	// Se verifica que la pila no cuente con valores
 	if (pila == NULL) {
-		printf("Pila es vacia!");
+		printf("\nPila es vacia!\n");
 	}
 	else {
 		auxNodo = pila;
@@ -392,5 +436,9 @@ float Lista::operacion(float operando1, float operando2, char operador)
 	case '^':
 		return pow(operando1, operando2);
 		break;
+	default:
+		return -1;
+		break;
+
 	}
 }
