@@ -1,6 +1,7 @@
 
 
 #include "lista.h"
+using namespace std;
 int main()
 {
 	Lista li;
@@ -20,20 +21,22 @@ int main()
 
 	printf("\nDigite la expresion infija: \n");
 	scanf_s("%s", expresion, 49);
+	//std::cout << "EXP : " << expresion;
 
 	if (li.verificarParentesisBalanceados(expresion)) {
-		postFija = li.evaluaExpresionIngresada(expresion);
+		postFija=li.evaluaExpresionIngresada(expresion);
 		li.mostrarExpresionPostFija(postFija);
+		printf("\n\nEl resultado es: %.2f", li.recorreExpresionPost(postFija));
 	}
 	else {
 		printf("\nExpresion no balanceada \n");
 	}
-	printf("\n\nEl resultado es: %.2f", li.evaluaExpresionPostFija(expresion));
+	
 	printf("\n\n");
 	system("pause");
 
 	
-
+	// (6+4)*2/8^(7-4)
 
 }
 

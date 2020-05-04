@@ -35,13 +35,14 @@ public:
 	Nodo* push(char simbolo, Nodo* pila);
 	Nodo* insertarNodoFinalLista(char simbolo, Nodo* lista);
 	Nodo* pop(char* valor, Nodo* pila);
+	Nodo* craerLista(Nodo *);
 	void mostrarExpresionPostFija(Nodo* lista);
 
 	bool verificarParentesisBalanceados(char expresion[]);
-	bool verificaElementoOperador(char simbolo);
+	int verificaElementoOperador(char simbolo);
 	int obtenerPrioridadElementos(char simbolo);
 	Nodo* evaluaExpresionIngresada(char expresion[]);
-
+	float recorreExpresionPost(Nodo* expresionPost);
 	int insertarValor(int valor);
 	float evaluaExpresionPostFija(char expresion[]);
 
