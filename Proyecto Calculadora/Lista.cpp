@@ -5,7 +5,10 @@
 // Metodo que crea la lista
 Lista::Lista()
 {
-	inicio = NULL;
+	inicio = NULL, expresionDividida=NULL;
+	contSuma=0,contResta=0,contDivision=0,
+	contMult=0,gradoExpresion = 0;
+	parentesis = false, elevado = false;
 }
 
 // Destructor de lista llama al metodo que borra datos de la lista
@@ -13,6 +16,78 @@ Lista::~Lista()
 {
 	eliminarLista();
 }
+
+
+
+// Metodo que clasifica el grado de expresion digitada por el usuario
+int Lista::clasificaGradoExpresion(char expresion[])
+{
+	//std::cout << "\nHOLA ESTOY EN LISTA:CPP\n";
+	Nodo* auxNodo;
+	char valorDato = ' ';
+	int i, longitudExpresion;
+	// Creamos y definimos el nuevo nodo auxiliar
+	auxNodo = (Nodo*)malloc(sizeof(Nodo));
+	auxNodo = NULL;
+	longitudExpresion = strlen(expresion);
+	
+
+
+	for (int i = 0; i < longitudExpresion; i++) {
+
+		// Verifica si la epxresion en el caracter recorrido 
+		// es un numero
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) {}
+		//Falso si no es un numero
+
+		// Falso no es un numero entonces se procede a clasificar su tipo
+		else {
+			// Si la expresion es un parentesis entonces el grado se clasifica en 3 o 4
+			if ((expresion[i] == '(')) {
+				parentesis = true;
+			}
+			// Falso si no es un operando o un parentesis de apertura
+			else {
+				// Verificamos que el elemento de la expresion sea un operador
+				if (verificaElementoOperador(expresion[i])) {
+					auxNodo = push(expresion[i], auxNodo);
+					if (expresion[i] == '^')
+						elevado=true;
+					
+				}
+			}
+		}
+	}
+	
+	return determinaGrado(auxNodo);
+}
+
+
+int Lista::determinaGrado(Nodo* pilaOperandos) {
+	int grado; grado = 0;
+	Nodo* auxNodo = NULL;
+	auxNodo = pilaOperandos;
+	int cont = 0;
+	cout << "\n MOSTRANDO LA PILA GUARDADA\n";
+	while (auxNodo != NULL) {
+		cout << " " << auxNodo->simbolo;
+		auxNodo = auxNodo->sig;
+		cont++;
+	}
+	if (elevado)
+		return grado = 4;
+	else if (parentesis)
+		return grado = 3;
+	else if (cont >= 2)
+		return grado = 2;
+	else if (cont == 1)
+	 	return grado = 1;
+	
+
+	return 0;
+}
+
+
 // Metodo que inserta un elemento nuevo a la pila 
 Nodo* Lista::push(char simb, Nodo* pila)
 {
@@ -110,9 +185,9 @@ Nodo* Lista::pop(char *valor, Nodo* pila)
 	return pila;
 }
 // Metodo que pertite crear una lista
-Nodo* Lista::craerLista(Nodo *lista)
+Nodo* Lista::craerLista(Nodo * nodoNuevo)
 {
-	return lista=NULL;
+	return nodoNuevo=NULL;
 }
 
 // Metodo para mostrar los elementos de la lista 
@@ -215,6 +290,70 @@ return 0;
 }
 
 
+Nodo* Lista::getExpresionGradoIPost(char expresion[]) {
+	cout << "\n %%%%%%%%%%%%%%%%%%%%%%%		EXPRESION	GRADO   I    %%%%%%%%%%%%%%%%%%%%%%\n";
+	cout<<expresion<<"\n";
+	Nodo* auxNodo, *auxNodo2, *expresionPostFija, *expPostDividida;
+	char valorDato = ' ';
+	int i=0, longitudExpresion=0;
+	auxNodo = (Nodo*)malloc(sizeof(Nodo));
+	auxNodo2 = (Nodo*)malloc(sizeof(Nodo));
+	auxNodo = NULL, auxNodo2 = NULL, expresionPostFija = NULL, expPostDividida = NULL;
+	longitudExpresion = strlen(expresion);
+	
+	// Mediante un ciclo for se recorre todos los valores contenidos en la expresion
+	for (i = 0; i < longitudExpresion; i++) {
+		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) {
+			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
+			expPostDividida = insertarNodoFinalLista(expresion[i], expPostDividida);
+			if (verificaElementoOperador(expresion[i+1])) {
+				expPostDividida = insertarNodoFinalLista('?', expPostDividida);
+			}
+			cout << "--> " << expresion[i] << "\n";
+		}
+			
+		else {
+
+			if (auxNodo == NULL) {
+				auxNodo = push(expresion[i], auxNodo);
+				//expPostDividida = insertarNodoFinalLista('?', expPostDividida);
+			}
+			// Falso si el nodo auxiliar contiene un elemento
+			else {
+				while (auxNodo->sig != NULL) {
+					auxNodo = auxNodo->sig;
+				}
+				auxNodo = push(expresion[i], auxNodo);
+			}
+		}
+
+	if (i == (longitudExpresion - 1)) {
+		auxNodo = pop(&valorDato, auxNodo);
+		expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+		expPostDividida = insertarNodoFinalLista('?', expPostDividida);
+		}
+	}
+	
+	cout << "\nVALORES EN EXPRESION DIVIDIDA\n";
+	Nodo* xd = NULL;
+	xd= expPostDividida;
+	while (xd != NULL) {
+		cout <<" "<<xd->simbolo;
+		xd = xd->sig;
+	}
+
+	expresionDividida = expPostDividida;
+	return expresionPostFija;
+}
+
+
+
+
+
+
+
+
 // Metodo que se encarga de evaluar la expresion ingresada por el usuario
 Nodo* Lista::evaluaExpresionIngresada(char expresion[])
 {
@@ -242,14 +381,9 @@ Nodo* Lista::evaluaExpresionIngresada(char expresion[])
 		// Verificamos el caracter en la epxresion segun el codigo de la tabla ASCII
 
 		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
-		if ((expresion[i] >= 48 && expresion[i] <= 57) ||  
-			(expresion[i] >= 65 && expresion[i] <= 90) ||
-			(expresion[i] >= 97 && expresion[i] <= 122))
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) 
 		{
 			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
-			/*cout << "[ ";
-			mostrarExpresionPostFija(expresionPostFija);
-			cout << " ]\n";*/
 		}
 		else {
 			//cout << " ELSE NO OPERADOR\n";
@@ -370,7 +504,10 @@ float Lista::recorreExpresionPost(Nodo* expresionPost) {
 	int i = 0;
 	auxNodo = (Nodo*)malloc(sizeof(Nodo));
 	auxNodo = expresionPost;
+
+	cout << "\n-------------------------------------------------\n";
 	while (auxNodo!= NULL) {
+		cout<<" "<<auxNodo->simbolo;
 		expresion[i]=auxNodo->simbolo;
 		auxNodo = auxNodo->sig;
 		i++;
@@ -383,7 +520,7 @@ float Lista::recorreExpresionPost(Nodo* expresionPost) {
 float Lista::evaluaExpresionPostFija(char expresion[])
 {
 	NodoFloat* pila = NULL;
-	int tamExpresion, i=0;
+	int tamExpresion=0, i=0;
 	char valorAux=' ';
 	float operando1, operando2, resultado;
 
@@ -394,7 +531,7 @@ float Lista::evaluaExpresionPostFija(char expresion[])
 		
 		if ((expresion[i] >= 48) && (expresion[i] <= 57)) {
 			valorAux = expresion[i];
-			//cout << " "<<valorAux;
+			cout << "   <::::::::> "<<valorAux;
 			//converite el valor y lo pasa tipo numerico flotante
 			pila = pushFloat(atof(&valorAux), pila);
 		}
@@ -499,3 +636,6 @@ float Lista::operacion(float operando1, float operando2, char operador)
 
 	}
 }
+
+
+

@@ -29,6 +29,7 @@ public:
 	Lista();
 	~Lista();
 
+	int clasificaGradoExpresion(char expresion[]);
 
 	
 
@@ -46,6 +47,11 @@ public:
 	int insertarValor(int valor);
 	float evaluaExpresionPostFija(char expresion[]);
 
+	// Devuelve el nodo de la expresion Grado I
+	Nodo* getExpresionGradoIPost(char expresion[]);
+
+	Nodo* getExpresionDividida(){ return expresionDividida;}
+
 
 private:
 
@@ -55,8 +61,16 @@ private:
 	NodoFloat* pushFloat(float valor, NodoFloat* pila);
 	NodoFloat* popFloat(float* valor, NodoFloat* pila);
 	float operacion(float operador1, float operador2, char operador);
+	int determinaGrado(Nodo*);
+	int contSuma;
+	int contResta;
+	int contDivision;
+	int contMult;
+	bool elevado;
+	bool parentesis;
+	int gradoExpresion;
 
-
+	Nodo* expresionDividida;
 };
 
 
