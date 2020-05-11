@@ -5,7 +5,7 @@
 // Metodo que crea la lista
 Lista::Lista()
 {
-	inicio = NULL, expresionDividida=NULL;
+	inicio = NULL;
 	contSuma=0,contResta=0,contDivision=0,
 	contMult=0,gradoExpresion = 0;
 	parentesis = false, elevado = false;
@@ -33,7 +33,7 @@ int Lista::clasificaGradoExpresion(char expresion[])
 	
 
 
-	for (int i = 0; i < longitudExpresion; i++) {
+	for ( i = 0; i < longitudExpresion; i++) {
 
 		// Verifica si la epxresion en el caracter recorrido 
 		// es un numero
@@ -68,24 +68,26 @@ int Lista::determinaGrado(Nodo* pilaOperandos) {
 	Nodo* auxNodo = NULL;
 	auxNodo = pilaOperandos;
 	int cont = 0;
-	cout << "\n MOSTRANDO LA PILA GUARDADA\n";
+	//cout << "\n MOSTRANDO LA PILA GUARDADA\n";
 	while (auxNodo != NULL) {
-		cout << " " << auxNodo->simbolo;
+		//cout << " " << auxNodo->simbolo;
 		auxNodo = auxNodo->sig;
 		cont++;
 	}
 	if (elevado)
-		return grado = 4;
+		 grado = 4;
 	else if (parentesis)
-		return grado = 3;
+		 grado = 3;
 	else if (cont >= 2)
-		return grado = 2;
+		 grado = 2;
 	else if (cont == 1)
-	 	return grado = 1;
+	 	 grado = 1;
 	
-
-	return 0;
+	eliminarLista();
+	return grado;
 }
+
+
 
 
 // Metodo que inserta un elemento nuevo a la pila 
@@ -153,6 +155,8 @@ Nodo* Lista::insertarNodoFinalLista(char simb, Nodo* lista)
 	}
 	return lista;
 }
+
+
 
 
 
@@ -289,79 +293,165 @@ int Lista::obtenerPrioridadElementos(char simbolo)
 return 0;
 }
 
+// ------------------------------------ G R A D O   I Y II  ----------------------------------------------------------
 
 Nodo* Lista::getExpresionGradoIPost(char expresion[]) {
-	cout << "\n %%%%%%%%%%%%%%%%%%%%%%%		EXPRESION	GRADO   I    %%%%%%%%%%%%%%%%%%%%%%\n";
-	cout<<expresion<<"\n";
-	Nodo* auxNodo, *auxNodo2, *expresionPostFija, *expPostDividida;
+	Nodo* auxNodo, *expresionPostFija;
 	char valorDato = ' ';
 	int i=0, longitudExpresion=0;
 	auxNodo = (Nodo*)malloc(sizeof(Nodo));
-	auxNodo2 = (Nodo*)malloc(sizeof(Nodo));
-	auxNodo = NULL, auxNodo2 = NULL, expresionPostFija = NULL, expPostDividida = NULL;
+	auxNodo = NULL, expresionPostFija = NULL;
 	longitudExpresion = strlen(expresion);
+	float resultado = 0;
+	char exp1[50]=" ", exp2[50]= " ", operando=' ';
+	bool ex1=false, ex2=false;
+	int cont=0;
 	
 	// Mediante un ciclo for se recorre todos los valores contenidos en la expresion
 	for (i = 0; i < longitudExpresion; i++) {
 		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
-		if ((expresion[i] >= 48 && expresion[i] <= 57)) {
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) 
 			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
-			expPostDividida = insertarNodoFinalLista(expresion[i], expPostDividida);
-			if (verificaElementoOperador(expresion[i+1])) {
-				expPostDividida = insertarNodoFinalLista('?', expPostDividida);
-			}
-			cout << "--> " << expresion[i] << "\n";
-		}
-			
+
+		// Falso si no es un numero entonces es un operador
 		else {
 
 			if (auxNodo == NULL) {
 				auxNodo = push(expresion[i], auxNodo);
-				//expPostDividida = insertarNodoFinalLista('?', expPostDividida);
 			}
 			// Falso si el nodo auxiliar contiene un elemento
 			else {
-				while (auxNodo->sig != NULL) {
-					auxNodo = auxNodo->sig;
-				}
-				auxNodo = push(expresion[i], auxNodo);
+				Nodo* recooreAuxiliar=NULL;
+				recooreAuxiliar = auxNodo;
+				while (recooreAuxiliar->sig!= NULL) {
+					recooreAuxiliar = recooreAuxiliar->sig;}
+				recooreAuxiliar = push(expresion[i], auxNodo);
+				auxNodo = recooreAuxiliar;
 			}
 		}
 
-	if (i == (longitudExpresion - 1)) {
-		auxNodo = pop(&valorDato, auxNodo);
-		expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
-		expPostDividida = insertarNodoFinalLista('?', expPostDividida);
-		}
-	}
-	
-	cout << "\nVALORES EN EXPRESION DIVIDIDA\n";
-	Nodo* xd = NULL;
-	xd= expPostDividida;
-	while (xd != NULL) {
-		cout <<" "<<xd->simbolo;
-		xd = xd->sig;
 	}
 
-	expresionDividida = expPostDividida;
+	// Verificamos que no haya quedado un valor en nodo auxiliar y de ser asi 
+	// es sacado del nodo axuliar y agregado a la expresion postfija
+	while (auxNodo != NULL) {
+		auxNodo = pop(&valorDato, auxNodo);
+		//cout << "\n QUEDO: " << valorDato;
+		expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+	}
+
 	return expresionPostFija;
 }
 
 
 
+float Lista::getResultadoExpresionGradoIPost(char expresion[]) {
+	Nodo* auxNodo;
+	char valorDato = ' ';
+	int i = 0, longitudExpresion = 0;
+	auxNodo = (Nodo*)malloc(sizeof(Nodo));
+	auxNodo = NULL;
+	longitudExpresion = strlen(expresion);
+	float resultado = 0;
+	char exp1[50] = " ", exp2[50] = " ", operando = ' ';
+	bool ex1 = false, ex2 = false;
+	int cont = 0;
+
+	// Mediante un ciclo for se recorre todos los valores contenidos en la expresion
+	for (i = 0; i < longitudExpresion; i++) {
+		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) {
+			if (!ex1) {	exp1[cont] = expresion[i]; cont++; }
+			else if (!ex2) { exp2[cont] = expresion[i]; cont++; }
+		}
+
+		// Falso si no es un numero entonces es un operador
+		else {
+			if (auxNodo == NULL) {
+				auxNodo = push(expresion[i], auxNodo);
+				ex1 = true; cont = 0; operando = expresion[i];
+			}
+		}
+
+		
+	}
+
+	// Verificamos que no haya quedado un valor en nodo auxiliar y de ser asi 
+	// es sacado del nodo axuliar y agregado para realizar el calculo del resultado
+	while (auxNodo != NULL) {
+		auxNodo = pop(&valorDato, auxNodo);
+		resultado = operacion(atoi(exp1), atoi(exp2), valorDato);
+	}
+
+	return resultado;
+}
+// -------------------------------  F I N   G R A D O   I  ------------------------------
+
+
+// -------------------------------	 G R A D O   I I		------------------------------
+float Lista::getResultadoExpresionGradoIIPost(char expresion[]) {
+	Nodo* auxNodo, * expresionPostFija;
+	char valorDato = ' ';
+	int i = 0, longitudExpresion = 0;
+	auxNodo = (Nodo*)malloc(sizeof(Nodo));
+	auxNodo = NULL, expresionPostFija=NULL;
+	longitudExpresion = strlen(expresion);
+	float resultado = 0;
+	char exp1[50] = " ", exp2[50] = " ", operando = ' ';
+	bool ex1 = false, ex2 = false;
+	int cont = 0;
+	bool negativa; negativa = false;
+
+	// Mediante un ciclo for se recorre todos los valores contenidos en la expresion
+	for (i = 0; i < longitudExpresion; i++) {
+		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) {
+			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
+			if (!ex1) { exp1[cont] = expresion[i]; cont++; }
+			else if (!ex2) { exp2[cont] = expresion[i]; cont++; }
+		}
+
+		// Falso si no es un numero entonces es un operador
+		else {
+			if (expresionPostFija == NULL) {
+				negativa = true;
+				exp1[cont] = expresion[i]; cont++;
+			}
+			else if (auxNodo == NULL) {
+				auxNodo = push(expresion[i], auxNodo);
+				ex1 = true; cont = 0; operando = expresion[i];
+			}
+			else if (auxNodo != NULL) {
+				exp2[cont] = expresion[i]; cont++;
+			}
+		}
+
+	}
+
+	// Verificamos que no haya quedado un valor en nodo auxiliar y de ser asi 
+	// es sacado del nodo axuliar y agregado para realizar el calculo del resultado
+	while (auxNodo != NULL) {
+		auxNodo = pop(&valorDato, auxNodo);
+		resultado = operacion(atoi(exp1), atoi(exp2), valorDato);
+	}
+
+	return resultado;
+}
+// ------------------------------   F I N  G R A D O   I I		------------------------------
 
 
 
 
 
+
+// -------------------------------	 G R A D O   I I I		------------------------------
 // Metodo que se encarga de evaluar la expresion ingresada por el usuario
-Nodo* Lista::evaluaExpresionIngresada(char expresion[])
+Nodo* Lista::getExpresionGradoIIIPost(char expresion[])
 {
 
-	cout << "\nEXPRESION	%%%%%%%%%%%%%%%%%%%%%%%	"<<expresion<<"\n";
 	Nodo* auxNodo;
 	Nodo* expresionPostFija;
-	char valorDato=' ';
+	char valorDato = ' ';
 	int i, longitudExpresion;
 	// Creamos y definimos el nuevo nodo auxiliar
 	auxNodo = (Nodo*)malloc(sizeof(Nodo));
@@ -370,90 +460,162 @@ Nodo* Lista::evaluaExpresionIngresada(char expresion[])
 	auxNodo = NULL;
 	expresionPostFija = NULL;
 
-	longitudExpresion=strlen(expresion);
+	longitudExpresion = strlen(expresion);
 	// Recorremos en un ciclo for el tamaño de la expresion para 
 	// evaluar los valores que esta contiene
 
-	std::cout << "\n-----RECORRE FOR CICLO------\n\n";
+	//std::cout << "\n-----RECORRE FOR CICLO------\n\n";
 	for (i = 0; i < longitudExpresion; i++) {
 
 		//std::cout <<" [ "<<expresion[i]<<" ]";
 		// Verificamos el caracter en la epxresion segun el codigo de la tabla ASCII
 
 		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
-		if ((expresion[i] >= 48 && expresion[i] <= 57)) 
+		if ((expresion[i] >= 48 && expresion[i] <= 57))
 		{
 			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
 		}
 		else {
-			//cout << " ELSE NO OPERADOR\n";
-			if ((expresion[i] == '(')) {
-				//cout << " ========= " << expresion[i]<<"\n";
-				auxNodo = push(expresion[i], auxNodo);
-			}
-			// Falso si no es un operando o un parentesis de apertura
-			else {
-				
-				// Verificamos que el elemento de la expresion sea un operador
-				if (verificaElementoOperador(expresion[i])) {
-					// Verificamos que la lista auxiliar este vacia
-					if (auxNodo == NULL)
-						auxNodo = push(expresion[i], auxNodo);
-					// Falso si el nodo auxiliar contiene un elemento
-					else {
-						// Se recorre el nodo auxiliar para verificar que los elementos sean menores
-						// en prioridad
-						while (auxNodo != NULL){
-
-							//cout<<"\n@- "<<auxNodo->simbolo<<" VALUE: "<<obtenerPrioridadElementos(auxNodo->simbolo)<<"\n";
-							// Veirficamos que la prioridad de elementos guardados en el nodo auxiliar
-							// sea mayor que la expresion del dato evaluado
-							if ((obtenerPrioridadElementos(auxNodo->simbolo) >=
-								obtenerPrioridadElementos(expresion[i]))) {
-								// Si es asi entonces se saca le valor que este en el tope
-								// del nodo auxiliar y lo insertamos en la expresion post fija
-								auxNodo = pop(&valorDato, auxNodo);
-								expresionPostFija=insertarNodoFinalLista(valorDato, expresionPostFija);
-								
-							}
-							// Falso sale del ciclo
-							else break;
-						}
-						// Se le pasa el valor que se evaluando al nodo auxliar
-						auxNodo = push(expresion[i], auxNodo);
+			// Verificamos que el elemento de la expresion sea un operador
+			if (verificaElementoOperador(expresion[i])) {
+				// Verificamos que la lista auxiliar este vacia
+				if (auxNodo == NULL) {
+					std::cout << " ? " << expresion[i];
+					auxNodo = push(expresion[i], auxNodo);
+				}
+				// Falso si el nodo auxiliar contiene un elemento
+				else {
+					// Se recorre el nodo auxiliar para verificar que los elementos sean menores
+					// en prioridad
+					Nodo* auxliarRecorre = NULL;
+					auxliarRecorre = auxNodo;
+					while (auxliarRecorre->sig != NULL) {
+						std::cout << " > " << auxliarRecorre->simbolo;
+						auxliarRecorre = auxliarRecorre->sig;
 					}
+					// Se le pasa el valor que se evaluando al nodo auxliar
+					auxliarRecorre = push(expresion[i], auxNodo);
+					auxNodo = auxliarRecorre;
 				}
 			}
 		}
 
-	// Verificamos que si caracter a evaluar es un parentesis de cerrar expresion
-	// entonces debemos verificar acomodar y sacar todos los elementos del nodo auxliar
-	// y agregarlos a la lista del nodo de la expresion post fija
-		if (expresion[i] == ')') {
-			// Se recorre y se retira los operadores de  nodo auxliar minetras esta sean
-			// difentes al parentesis de apertura o esta no sea vacia - nula
-			while ((auxNodo!= NULL) && (auxNodo->simbolo != '(') && (auxNodo->sig!= NULL)) {
-				// se retira el valor del nodo auxiliar 
-				auxNodo = pop(&valorDato, auxNodo);
-				// Se agrega el valor y se inserta al final del la expresion postfija
-				expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
-			}
-			// Sacamos el caracter de parentesis de apertura
-			
-			auxNodo = pop(&valorDato, auxNodo);
-		}
 	}
-	
 
+	Nodo* auxOperadores = NULL;
 	// Verificamos que no haya quedado un valor en nodo auxiliar y de ser asi 
 	// es sacado del nodo axuliar y agregado a la expresion postfija
 	while (auxNodo != NULL) {
 		auxNodo = pop(&valorDato, auxNodo);
+		auxOperadores = push(valorDato, auxOperadores);
+	}
+
+	// Todos los datos de la pila de operadores los saca e invierte el orden
+	while (auxOperadores != NULL) {
+		auxOperadores = pop(&valorDato, auxOperadores);
 		expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
 	}
 
 	return expresionPostFija;
 }
+
+
+// Metodo que recorre y evalua la expresion de grado III
+float Lista::getResultadoExpresionGradoIIIPost(char expresion[]) {
+	Nodo* auxNodo, * expresionPostFija;
+	NodoFloat *resultadoPila;
+	char valorDato = ' ';
+	int i = 0, longitudExpresion = 0;
+	auxNodo = (Nodo*)malloc(sizeof(Nodo));
+	auxNodo = NULL, expresionPostFija = NULL, resultadoPila=NULL;
+	longitudExpresion = strlen(expresion);
+	float resultado = 0.0, valorSacado=0.0;
+	char exp1[50] = " ", exp2[50] = " ", operando = ' ';
+	bool ex1 = false, ex2 = false;
+	int cont1= 0, cont2=0;
+	bool negativa; negativa = false;
+
+	// Mediante un ciclo for se recorre todos los valores contenidos en la expresion
+	for (i = 0; i < longitudExpresion; i++) {
+		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
+		if ((expresion[i] >= 48 && expresion[i] <= 57)) {
+			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
+
+			
+			if (!ex1) { 
+				exp1[cont1] = expresion[i]; 
+				cont1++; 
+			}
+			else if (!ex2) {
+				exp2[cont2] = expresion[i]; 
+				cont2++; 
+			}
+		}
+
+		// Falso si no es un numero entonces es un operador
+		else {
+			if ((expresion[i]=='(')) {
+				auxNodo = push(expresion[i], auxNodo);
+			}
+			else {
+				// Verifica que el caracter de la expresion[i] sea un operador (+,*,-,/)
+				if (verificaElementoOperador(expresion[i])) {
+					if (auxNodo == NULL) {
+						if (expresion[i]=='-') negativa = true;
+						
+						auxNodo = push(expresion[i], auxNodo);
+						exp1[cont1] = expresion[i]; cont1++;
+					}
+
+					else {
+
+						//std::cout << "\n---------------- "<<cont1<<"\n";
+						auxNodo = push(expresion[i], auxNodo);
+						if (cont1 >= 1 && !ex1) {
+							//std::cout << "##\n";
+							operando = expresion[i];
+							ex1 = true;
+						}
+						else if (ex1) {
+							exp2[cont2] = expresion[i]; cont2++;
+						}
+					}
+
+				}
+			}
+
+		}
+
+		// Cuando encuentra un parentesis de cerrar saca los elementos realiza su operacion
+		/// y los vuelve a guardar en la pila
+		if (expresion[i] == ')') {
+			std::cout << "\n DATO 1 ::: " << atoi(exp1) << " <>  DATO 2  ::: " << atoi(exp2)<<" <> "<<operando;
+
+			resultado = operacion(atoi(exp1), atoi(exp2), operando);
+			resultadoPila=pushFloat(resultado, resultadoPila);
+			ex1 = false, ex2 = false;
+			cont1 = 0, cont2 = 0;
+			std::cout << "\n############################################\n";
+			std::cout << resultado;
+		}
+
+	}
+	resultado = 0;
+	while (resultadoPila!=NULL)
+	{
+		resultadoPila = popFloat(&valorSacado, resultadoPila);
+		resultado += valorSacado;
+	}
+
+	return resultado;
+}
+
+
+
+
+// ------------------------------   F I N  G R A D O   I I I		------------------------------
+
+
 
 
 
@@ -505,9 +667,9 @@ float Lista::recorreExpresionPost(Nodo* expresionPost) {
 	auxNodo = (Nodo*)malloc(sizeof(Nodo));
 	auxNodo = expresionPost;
 
-	cout << "\n-------------------------------------------------\n";
+	//cout << "\n-------------------------------------------------\n";
 	while (auxNodo!= NULL) {
-		cout<<" "<<auxNodo->simbolo;
+		//cout<<" "<<auxNodo->simbolo;
 		expresion[i]=auxNodo->simbolo;
 		auxNodo = auxNodo->sig;
 		i++;
@@ -526,19 +688,17 @@ float Lista::evaluaExpresionPostFija(char expresion[])
 
 	// convierte el valor de la expresion pasada
 	tamExpresion = strlen(expresion);
-	cout << "\n\nEXPRESION :::::: " << expresion<<"\n";
 	for (i = 0; i < tamExpresion; i++) {
 		
 		if ((expresion[i] >= 48) && (expresion[i] <= 57)) {
 			valorAux = expresion[i];
-			cout << "   <::::::::> "<<valorAux;
+			
 			//converite el valor y lo pasa tipo numerico flotante
 			pila = pushFloat(atof(&valorAux), pila);
 		}
 		else {
 			pila = popFloat(&operando2, pila);
 			pila = popFloat(&operando1, pila);
-
 			resultado = operacion(operando1, operando2, expresion[i]);
 
 			pila = pushFloat(resultado, pila);
@@ -554,12 +714,12 @@ float Lista::evaluaExpresionPostFija(char expresion[])
 // Metodo que recorre los valores de la lista y los elimina
 void Lista::eliminarLista()
 {
-	Nodo* aux;
-	while (inicio != nullptr) {
-		aux = inicio;
-		inicio = inicio->sig;
-		delete aux;
-	}
+	elevado = false;
+	parentesis = false;
+	contMult = 0;
+	contResta = 0;
+	contSuma = 0;
+	contDivision = 0;
 }
 
 
@@ -636,6 +796,134 @@ float Lista::operacion(float operando1, float operando2, char operador)
 
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~		C O P I A   D E   S E G U R I D A D		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//// Metodo que se encarga de evaluar la expresion ingresada por el usuario
+//Nodo* Lista::evaluaExpresionIngresada(char expresion[])
+//{
+//
+//	std::cout << "\nEXPRESION	%%%%%%%%%%%%%%%%%%%%%%%	" << expresion << "\n";
+//	Nodo* auxNodo;
+//	Nodo* expresionPostFija;
+//	char valorDato = ' ';
+//	int i, longitudExpresion;
+//	// Creamos y definimos el nuevo nodo auxiliar
+//	auxNodo = (Nodo*)malloc(sizeof(Nodo));
+//	// Creamos y definimos el nuevo nodo de expresion postFija
+//	expresionPostFija = (Nodo*)malloc(sizeof(Nodo));
+//	auxNodo = NULL;
+//	expresionPostFija = NULL;
+//
+//	longitudExpresion = strlen(expresion);
+//	// Recorremos en un ciclo for el tamaño de la expresion para 
+//	// evaluar los valores que esta contiene
+//
+//	//std::cout << "\n-----RECORRE FOR CICLO------\n\n";
+//	for (i = 0; i < longitudExpresion; i++) {
+//
+//		//std::cout <<" [ "<<expresion[i]<<" ]";
+//		// Verificamos el caracter en la epxresion segun el codigo de la tabla ASCII
+//
+//		// Si valor en la tabla es del 48 al 57 - Es un numero del 0 al 9
+//		if ((expresion[i] >= 48 && expresion[i] <= 57))
+//		{
+//			expresionPostFija = insertarNodoFinalLista(expresion[i], expresionPostFija);
+//		}
+//		else {
+//			//cout << " ELSE NO OPERADOR\n";
+//			if ((expresion[i] == '(')) {
+//				//cout << " ========= " << expresion[i]<<"\n";
+//				auxNodo = push(expresion[i], auxNodo);
+//			}
+//			// Falso si no es un operando o un parentesis de apertura
+//			else {
+//
+//				// Verificamos que el elemento de la expresion sea un operador
+//				if (verificaElementoOperador(expresion[i])) {
+//					// Verificamos que la lista auxiliar este vacia
+//					if (auxNodo == NULL)
+//						auxNodo = push(expresion[i], auxNodo);
+//					// Falso si el nodo auxiliar contiene un elemento
+//					else {
+//						// Se recorre el nodo auxiliar para verificar que los elementos sean menores
+//						// en prioridad
+//						while (auxNodo != NULL) {
+//
+//							//cout<<"\n@- "<<auxNodo->simbolo<<" VALUE: "<<obtenerPrioridadElementos(auxNodo->simbolo)<<"\n";
+//							// Veirficamos que la prioridad de elementos guardados en el nodo auxiliar
+//							// sea mayor que la expresion del dato evaluado
+//							if ((obtenerPrioridadElementos(auxNodo->simbolo) >=
+//								obtenerPrioridadElementos(expresion[i]))) {
+//								// Si es asi entonces se saca le valor que este en el tope
+//								// del nodo auxiliar y lo insertamos en la expresion post fija
+//								auxNodo = pop(&valorDato, auxNodo);
+//								expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+//
+//							}
+//							// Falso sale del ciclo
+//							else break;
+//						}
+//						// Se le pasa el valor que se evaluando al nodo auxliar
+//						auxNodo = push(expresion[i], auxNodo);
+//					}
+//				}
+//			}
+//		}
+//
+//		// Verificamos que si caracter a evaluar es un parentesis de cerrar expresion
+//		// entonces debemos verificar acomodar y sacar todos los elementos del nodo auxliar
+//		// y agregarlos a la lista del nodo de la expresion post fija
+//		if (expresion[i] == ')') {
+//			// Se recorre y se retira los operadores de  nodo auxliar minetras esta sean
+//			// difentes al parentesis de apertura o esta no sea vacia - nula
+//			while ((auxNodo != NULL) && (auxNodo->simbolo != '(') && (auxNodo->sig != NULL)) {
+//				// se retira el valor del nodo auxiliar 
+//				auxNodo = pop(&valorDato, auxNodo);
+//				// Se agrega el valor y se inserta al final del la expresion postfija
+//				expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+//			}
+//			// Sacamos el caracter de parentesis de apertura
+//
+//			auxNodo = pop(&valorDato, auxNodo);
+//		}
+//	}
+//
+//
+//	// Verificamos que no haya quedado un valor en nodo auxiliar y de ser asi 
+//	// es sacado del nodo axuliar y agregado a la expresion postfija
+//	while (auxNodo != NULL) {
+//		auxNodo = pop(&valorDato, auxNodo);
+//		expresionPostFija = insertarNodoFinalLista(valorDato, expresionPostFija);
+//	}
+//
+//	return expresionPostFija;
+//}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

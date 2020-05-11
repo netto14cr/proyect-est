@@ -4,7 +4,7 @@
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
-using std::cout;
+//using std::cout;
 
 
 struct Nodo {
@@ -26,32 +26,37 @@ class Lista {
 
 public:
 
+
+
 	Lista();
 	~Lista();
 
-	int clasificaGradoExpresion(char expresion[]);
-
 	
-
-	Nodo* push(char simbolo, Nodo* pila);
-	Nodo* insertarNodoFinalLista(char simbolo, Nodo* lista);
-	Nodo* pop(char* valor, Nodo* pila);
-	Nodo* craerLista(Nodo *);
 	void mostrarExpresionPostFija(Nodo* lista);
 
 	bool verificarParentesisBalanceados(char expresion[]);
 	int verificaElementoOperador(char simbolo);
 	int obtenerPrioridadElementos(char simbolo);
-	Nodo* evaluaExpresionIngresada(char expresion[]);
 	float recorreExpresionPost(Nodo* expresionPost);
 	int insertarValor(int valor);
 	float evaluaExpresionPostFija(char expresion[]);
 
-	// Devuelve el nodo de la expresion Grado I
+
+	// -------    M E T O D O S  C A L C U L A D O R A  U S A D O S    ------------
+	int clasificaGradoExpresion(char expresion[]);
+	Nodo* push(char simbolo, Nodo* pila);
+	Nodo* insertarNodoFinalLista(char simbolo, Nodo* lista);
+	Nodo* pop(char* valor, Nodo* pila);
+	Nodo* craerLista(Nodo*);
+
+	// G R A D O  I
 	Nodo* getExpresionGradoIPost(char expresion[]);
-
-	Nodo* getExpresionDividida(){ return expresionDividida;}
-
+	float getResultadoExpresionGradoIPost(char expresion[]);
+	// G R A D O  I I 
+	float getResultadoExpresionGradoIIPost(char expresion[]);
+	// G R A D O  I I I
+	Nodo* getExpresionGradoIIIPost(char expresion[]);
+	float getResultadoExpresionGradoIIIPost(char expresion[]);
 
 private:
 
@@ -61,16 +66,11 @@ private:
 	NodoFloat* pushFloat(float valor, NodoFloat* pila);
 	NodoFloat* popFloat(float* valor, NodoFloat* pila);
 	float operacion(float operador1, float operador2, char operador);
+	float resultadoExpresion;
+	void setResultado(float result) { resultadoExpresion = result;}
 	int determinaGrado(Nodo*);
-	int contSuma;
-	int contResta;
-	int contDivision;
-	int contMult;
-	bool elevado;
-	bool parentesis;
-	int gradoExpresion;
-
-	Nodo* expresionDividida;
+	int contSuma, contResta,contDivision,contMult, gradoExpresion;
+	bool elevado, parentesis;
 };
 
 
